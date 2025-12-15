@@ -37,6 +37,6 @@ Alerts (Console + JSON file)
 ```bash
 git clone https://github.com/islemdouakha/simple_ids.git
 cd simple-ids
-
+```
 2. pip install -r requirements.txt
 
