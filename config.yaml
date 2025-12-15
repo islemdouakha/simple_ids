@@ -1,0 +1,5 @@
+ssh:
+  brute_force:
+    threshold: 3
+    time_window_seconds: 120
+    cooldown_seconds: 300

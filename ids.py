@@ -1,11 +1,14 @@
 from parser import parse_log_file
 from rules import SSHBruteForceDetector
+from config import load_config
 
 if __name__ == "__main__":
+    config = load_config()
+
     detector = SSHBruteForceDetector(
-        threshold=3,
-        time_window_seconds=120,
-        cooldown_seconds=300
+        threshold=config["threshold"],
+        time_window_seconds=config["time_window_seconds"],
+        cooldown_seconds=config["cooldown_seconds"],
     )
 
     for event in parse_log_file("samples/auth.log"):
