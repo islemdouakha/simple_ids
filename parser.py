@@ -7,22 +7,54 @@ FAILED_LOGIN_REGEX = re.compile(
     r'Failed password for (invalid user )?(?P<user>\S+) from (?P<ip>\S+)'
 )
 
+SUCCESS_LOGIN_REGEX = re.compile(
+    r'^(?P<month>\w{3})\s+(?P<day>\d+)\s+(?P<time>\d+:\d+:\d+).*'
+    r'Accepted password for (?P<user>\S+) from (?P<ip>\S+)'
+)
+
+
 def parse_ssh_log_line(line):
-
-    match = FAILED_LOGIN_REGEX.search(line)
-    if not match:
-        return None
-
+    """
+    Parse a single SSH log line.
+    Returns a dict if the line matches a known pattern, otherwise None.
+    """
     now = datetime.now()
-    timestamp_str = f"{match.group('month')} {match.group('day')} {match.group('time')} {now.year}"
-    timestamp = datetime.strptime(timestamp_str, "%b %d %H:%M:%S %Y")
 
-    return {
-        "timestamp": timestamp,
-        "event_type": "FAILED_LOGIN",
-        "username": match.group("user"),
-        "ip": match.group("ip"),
-    }
+    failed_match = FAILED_LOGIN_REGEX.search(line)
+    if failed_match:
+        timestamp_str = (
+            f"{failed_match.group('month')} "
+            f"{failed_match.group('day')} "
+            f"{failed_match.group('time')} "
+            f"{now.year}"
+        )
+        timestamp = datetime.strptime(timestamp_str, "%b %d %H:%M:%S %Y")
+
+        return {
+            "timestamp": timestamp,
+            "event_type": "FAILED_LOGIN",
+            "username": failed_match.group("user"),
+            "ip": failed_match.group("ip"),
+        }
+
+    success_match = SUCCESS_LOGIN_REGEX.search(line)
+    if success_match:
+        timestamp_str = (
+            f"{success_match.group('month')} "
+            f"{success_match.group('day')} "
+            f"{success_match.group('time')} "
+            f"{now.year}"
+        )
+        timestamp = datetime.strptime(timestamp_str, "%b %d %H:%M:%S %Y")
+
+        return {
+            "timestamp": timestamp,
+            "event_type": "SUCCESSFUL_LOGIN",
+            "username": success_match.group("user"),
+            "ip": success_match.group("ip"),
+        }
+
+    return None
 
 def parse_log_file(path):
     with open(path, "r") as f:
