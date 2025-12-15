@@ -49,5 +49,51 @@ class SSHBruteForceDetector:
                 "cooldown_seconds": self.cooldown.seconds,
                 "last_seen": timestamp,
             }
+        
+class SSHUserEnumerationDetector:
+    def __init__(self, threshold=5, time_window_seconds=120, cooldown_seconds=300):
+        self.threshold = threshold
+        self.time_window = timedelta(seconds=time_window_seconds)
+        self.cooldown = timedelta(seconds=cooldown_seconds)
+
+        self.attempts = defaultdict(list)
+        self.last_alert_time = {}
+
+    def process_event(self, event):
+        if event["event_type"] != "INVALID_USER":
+            return None
+
+        ip = event["ip"]
+        username = event["username"]
+        timestamp = event["timestamp"]
+
+        self.attempts[ip].append((timestamp, username))
+
+        # Keep events within time window
+        self.attempts[ip] = [
+            (t, u) for (t, u) in self.attempts[ip]
+            if timestamp - t <= self.time_window
+        ]
+
+        # Count unique usernames
+        unique_users = {u for (_, u) in self.attempts[ip]}
+
+        if len(unique_users) >= self.threshold:
+            last_alert = self.last_alert_time.get(ip)
+            if last_alert and (timestamp - last_alert) < self.cooldown:
+                return None
+
+            self.last_alert_time[ip] = timestamp
+
+            return {
+                "alert_type": "SSH_USER_ENUMERATION",
+                "ip": ip,
+                "unique_usernames": len(unique_users),
+                "time_window_seconds": self.time_window.seconds,
+                "last_seen": timestamp,
+            }
+
+        return None
+
 
         return None

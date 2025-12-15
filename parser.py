@@ -12,6 +12,11 @@ SUCCESS_LOGIN_REGEX = re.compile(
     r'Accepted password for (?P<user>\S+) from (?P<ip>\S+)'
 )
 
+INVALID_USER_REGEX = re.compile(
+    r'^(?P<month>\w{3})\s+(?P<day>\d+)\s+(?P<time>\d+:\d+:\d+).*'
+    r'Invalid user (?P<user>\S+) from (?P<ip>\S+)'
+)
+
 
 def parse_ssh_log_line(line):
     """
@@ -52,6 +57,23 @@ def parse_ssh_log_line(line):
             "event_type": "SUCCESSFUL_LOGIN",
             "username": success_match.group("user"),
             "ip": success_match.group("ip"),
+        }
+    
+    invalid_match = INVALID_USER_REGEX.search(line)
+    if invalid_match:
+        timestamp_str = (
+            f"{invalid_match.group('month')} "
+            f"{invalid_match.group('day')} "
+            f"{invalid_match.group('time')} "
+            f"{now.year}"
+        )
+        timestamp = datetime.strptime(timestamp_str, "%b %d %H:%M:%S %Y")
+
+        return {
+            "timestamp": timestamp,
+            "event_type": "INVALID_USER",
+            "username": invalid_match.group("user"),
+            "ip": invalid_match.group("ip"),
         }
 
     return None
