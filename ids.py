@@ -2,10 +2,12 @@ from parser import parse_log_file
 from rules import SSHBruteForceDetector, SSHUserEnumerationDetector
 from config import load_config
 from mitre import enrich_alert_with_mitre
+import json
 
 if __name__ == "__main__":
     config = load_config()
 
+    all_alerts = []
     brute_force = SSHBruteForceDetector(
         threshold=config["threshold"],
         time_window_seconds=config["time_window_seconds"],
@@ -21,7 +23,9 @@ if __name__ == "__main__":
     for event in parse_log_file("samples/auth.log"):
         for detector in (brute_force, user_enum):
             alert = detector.process_event(event)
+
             if alert:
+                all_alerts.append(alert)
                 alert = enrich_alert_with_mitre(alert)
 
                 print(f"[ALERT] {alert['alert_type']} detected")
@@ -35,3 +39,7 @@ if __name__ == "__main__":
                     print(f"    Reference: {mitre['url']}")
 
                     print("-" * 50)
+    with open("alerts.json", "w") as f:
+        json.dump(all_alerts, f, default=str, indent=4)
+
+    print(f"\n[INFO] {len(all_alerts)} alerts saved to alerts.json")
