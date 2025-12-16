@@ -59,4 +59,6 @@ Tests can be run using:
 
 ```bash
 python -m pytest
+```
+![Python CI](https://github.com/islemdouakha/simple-ids/actions/workflows/python-ci.yml/badge.svg)
 
