@@ -12,6 +12,7 @@ It parses logs, detects suspicious activity (failed logins, brute-force attacks,
 - Configurable via `config.yaml` for thresholds and time windows
 - MITRE ATT&CK mapping for all alerts
 - Exports alerts to `alerts.json` for SIEM integration
+- Unit tests
 
 ## Architecture
 
@@ -39,4 +40,12 @@ git clone https://github.com/islemdouakha/simple_ids.git
 cd simple-ids
 ```
 2. pip install -r requirements.txt
+
+## Testing
+
+Unit tests are provided for the SSH log parser and detection rules.
+Tests can be run using:
+
+```bash
+python -m pytest
 
