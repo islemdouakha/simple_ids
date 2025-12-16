@@ -30,4 +30,4 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest --cov=.
+        python -m pytest --cov=.
