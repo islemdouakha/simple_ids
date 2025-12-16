@@ -6,6 +6,7 @@ import json
 
 if __name__ == "__main__":
     config = load_config()
+    log_path = config["log_path"]
 
     all_alerts = []
     brute_force = SSHBruteForceDetector(
@@ -20,7 +21,7 @@ if __name__ == "__main__":
         cooldown_seconds=300,
     )
 
-    for event in parse_log_file("samples/auth.log"):
+    for event in parse_log_file(log_path):
         for detector in (brute_force, user_enum):
             alert = detector.process_event(event)
 

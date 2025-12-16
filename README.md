@@ -41,6 +41,17 @@ cd simple-ids
 ```
 2. pip install -r requirements.txt
 
+## Configuration
+
+The log file path is defined in `config.yaml`, allowing the IDS to be deployed
+on different systems without modifying code.
+
+Example:
+```yaml
+log:
+  path: /var/log/auth.log
+
+
 ## Testing
 
 Unit tests are provided for the SSH log parser and detection rules.

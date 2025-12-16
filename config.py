@@ -1,4 +1,5 @@
 import yaml
+import os
 
 def load_config(path="config.yaml"):
     """
@@ -9,11 +10,18 @@ def load_config(path="config.yaml"):
             config = yaml.safe_load(f)
     except FileNotFoundError:
         raise RuntimeError(f"Config file not found: {path}")
+    
+    
 
     # Basic validation
     try:
+        log_path = config["log"]["path"]
+        if not os.path.isfile(log_path):
+            raise RuntimeError(f"Log file does not exist: {log_path}")
+        
         ssh_config = config["ssh"]["brute_force"]
         return {
+            "log_path": log_path,
             "threshold": int(ssh_config["threshold"]),
             "time_window_seconds": int(ssh_config["time_window_seconds"]),
             "cooldown_seconds": int(ssh_config["cooldown_seconds"]),

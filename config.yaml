@@ -1,3 +1,6 @@
+log:
+  path: samples/auth.log
+
 ssh:
   brute_force:
     threshold: 3
