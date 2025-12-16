@@ -50,7 +50,7 @@ Example:
 ```yaml
 log:
   path: /var/log/auth.log
-
+```
 
 ## Testing
 
